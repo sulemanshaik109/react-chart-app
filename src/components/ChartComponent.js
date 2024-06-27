@@ -104,7 +104,7 @@ const ChartComponent = () => {
                 },
                 title: function(tooltipItems) {
                   const timestamp = data[tooltipItems[0].dataIndex].timestamp;
-                  return `Timestamp: ${timestamp}`;
+                  return `Timestamp: ${new Date(timestamp).toDateString()}`;
                 },
               },
             },
