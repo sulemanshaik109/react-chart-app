@@ -40,6 +40,36 @@ To run this project locally, follow these steps:
   ```
 - Navigate to `http://localhost:3000` to view the application in the browser.
 
+## Project Structure
+
+- `src/components`: Contains React components used in the application.
+  - `ChartComponent.js`: The main chart component that renders the line chart.
+  - `TimeframeSelector.js`: Component for selecting the timeframe (daily, weekly, monthly).
+- `src/utils`: Utility functions for data aggregation.
+  - `aggregateData.js`: Functions to aggregate data into weekly and monthly views.
+- `src/data`: Contains the sample data in JSON format.
+  - `chartData.json`: Sample data used for the chart.
+
+## Usage
+
+### Timeframe Selection
+
+Use the dropdown menu to select the timeframe for viewing the data:
+
+- **Daily**: View data points for each day.
+- **Weekly**: Aggregate data points into weekly averages.
+- **Monthly**: Aggregate data points into monthly averages.
+
+### Zoom and Pan
+
+- **Zoom**: Use the mouse wheel or pinch on touch devices to zoom in and out.
+- **Pan**: Click and drag to pan across the chart.
+
+### Reset Zoom
+
+Click the "Reset Zoom" button to reset the chart to its original zoom level.
+
+
 ### Resources
 
 <details>
