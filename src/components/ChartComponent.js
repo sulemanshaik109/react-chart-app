@@ -32,71 +32,31 @@ ChartJS.register(
 );
 
 const ChartComponent = () => {
-  const [data, setData] = useState({
-    labels: [],
-    datasets: [{
-      label: 'Value',
-      data: [],
-      borderColor: 'blue',
-      backgroundColor: 'rgba(0, 123, 255, 0.2)',
-    }],
-  });
+  const [data, setData] = useState(chartData);
   const [timeframe, setTimeframe] = useState('daily');
-  const [clickedData, setClickedData] = useState(null);
   const chartRef = useRef(null);
 
   useEffect(() => {
-    // Example aggregation functions; replace with your own logic
     if (timeframe === "weekly") {
-      setData(aggregateWeeklyData({
-        labels: chartData.map(item => item.timestamp),
-        datasets: [{
-          label: 'Value',
-          data: chartData.map(item => item.value),
-          borderColor: 'blue',
-          backgroundColor: 'rgba(0, 123, 255, 0.2)',
-        }],
-      }));
+      setData(aggregateWeeklyData(chartData));
     } else if (timeframe === "monthly") {
-      setData(aggregateMonthlyData({
-        labels: chartData.map(item => item.timestamp),
-        datasets: [{
-          label: 'Value',
-          data: chartData.map(item => item.value),
-          borderColor: 'blue',
-          backgroundColor: 'rgba(0, 123, 255, 0.2)',
-        }],
-      }));
+      setData(aggregateMonthlyData(chartData));
     } else {
-      setData({
-        labels: chartData.map(item => item.timestamp),
-        datasets: [{
-          label: 'Value',
-          data: chartData.map(item => item.value),
-          borderColor: 'blue',
-          backgroundColor: 'rgba(0, 123, 255, 0.2)',
-        }],
-      });
+      setData(chartData);
     }
   }, [timeframe]);
 
-  const handleTimeframeSelect = (selectedTimeframe) => {
-    setTimeframe(selectedTimeframe);
+  const updatedData = {
+    labels: data.map(item => new Date(item.timestamp).toDateString()),
+    datasets: [{
+      label: 'Value',
+      data: data.map(item => item.value),
+      borderColor: '#4bc0c0',
+    }],
   };
 
-  const handlePointClick = (event, elements) => {
-    if (elements.length > 0) {
-      const clickedIndex = elements[0].index;
-      const clickedDatasetIndex = elements[0].datasetIndex;
-      const clickedDataset = data.datasets[clickedDatasetIndex];
-      const clickedValue = clickedDataset.data[clickedIndex];
-
-      // Example: Displaying clicked data in console
-      console.log(`Clicked Data: ${clickedValue}`);
-
-      // Set state to trigger UI update with clicked data details
-      setClickedData(clickedValue);
-    }
+  const handleTimeframeSelect = (selectedTimeframe) => {
+    setTimeframe(selectedTimeframe);
   };
 
   const resetZoom = () => {
@@ -105,14 +65,11 @@ const ChartComponent = () => {
     }
   };
 
-
   return (
     <div className="chart-container">
-      <h2 className="chart-title">My Chart</h2>
-      <TimeframeSelector onSelect={handleTimeframeSelect} />
-      <button className="reset-zoom-btn" onClick={resetZoom}>Reset Zoom</button>
+      <TimeframeSelector onSelect={handleTimeframeSelect} selectedTimeframe={timeframe} />
       <Line
-        data={data}
+        data={updatedData}
         options={{
           responsive: true,
           maintainAspectRatio: false,
@@ -132,17 +89,30 @@ const ChartComponent = () => {
                 mode: 'x',
               },
             },
+            tooltip: {
+              enabled: true,
+              mode: 'nearest',
+              intersect: false,
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  label += context.raw.toFixed(2);
+                  return label;
+                },
+                title: function(tooltipItems) {
+                  const timestamp = data[tooltipItems[0].dataIndex].timestamp;
+                  return `Timestamp: ${timestamp}`;
+                },
+              },
+            },
           },
-          onClick: handlePointClick, // Attach click handler
         }}
         ref={chartRef}
       />
-      {clickedData && (
-        <div className="clicked-data-details">
-          {/* Example: Display clicked data details */}
-          <p>Clicked Data: {clickedData}</p>
-        </div>
-      )}
+      <button className="reset-zoom-btn" onClick={resetZoom}>Reset Zoom</button>
     </div>
   );
 };
